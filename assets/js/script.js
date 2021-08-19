@@ -13,7 +13,6 @@ var createTask = function(taskText, taskDate, taskList) {
   // append span and p element to parent li
   taskLi.append(taskSpan, taskP);
 
-
   // append to ul list on the page
   $("#list-" + taskList).append(taskLi);
 };
@@ -138,21 +137,21 @@ $(".list-group").on("blur", "input[type='text']", function() {
 
 //allow for sorting
 $(".card .list-group").sortable({
-  connectWith: $(".car .list-group"),
+  connectWith: $(".card .list-group"),
   scroll: false,
   tolerance: "pointer",
   helper: "clone",
-  activate: function(event){
-    console.log("activate", this);
+  activate: function(event, ui){
+    console.log(ui);
   },
-  deactivate: function(event){
-    console.log("deactivate", this);
+  deactivate: function(event, ui){
+    console.log(ui);
   },
   over: function(event){
-    console.log("over", event.target);
+    console.log(event);
   },
   out: function(event){
-    console.log("out", event.target);
+    console.log(event);
   },
   update: function(event) {
     // array to store the task data
@@ -160,20 +159,15 @@ $(".card .list-group").sortable({
 
     //loop over current set of children in sortable list
     $(this).children().each(function(){
-      var text = $(this)
-        .find("p")
-        .text()
-        .trim();
-
-      var date = $(this)
-        .find("span")
-        .text()
-        .trim();
-      
-      //add task data to the temp array as an object
       tempArr.push({
-        text: text,
-        date: date
+        text: $(this)
+          .find("p")
+          .text()
+          .trim(),
+        date :$(this)
+          .find("span")
+          .text()
+          .trim()
       });
     });
     var arrName = $(this)
@@ -183,7 +177,9 @@ $(".card .list-group").sortable({
       //update array on task object and save
       tasks[arrName] = tempArr;
       saveTasks();
-    console.log(tempArr);
+  },
+  stop: function(event) {
+    $(this).removeClass("dropover");
   }
 });
 
@@ -191,14 +187,13 @@ $("#trash").droppable({
   accept: ".card .list-group-item",
   tolerance: "touch",
   drop: function(event, ui) {
-    console.log("drop");
     ui.draggable.remove();
   },
   over: function(event, ui) {
-    console.log("over");
+    console.log(ui);
   },
   out: function(event, ui) {
-    console.log("out");
+    console.log(ui);
   }
 });
 
