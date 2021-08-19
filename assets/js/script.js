@@ -106,7 +106,7 @@ $(".list-group").on("click", "span", function() {
 
   //enable jquery ui datepicker
   dateInput.datepicker({
-    //minDate: 1,
+    minDate: 1,
     onClose: function() {
       //when calendar is close, force a "change" event on the 'dateInput'
       $(this).trigger("change");
@@ -157,16 +157,18 @@ $(".card .list-group").sortable({
   tolerance: "pointer",
   helper: "clone",
   activate: function(event, ui){
-    console.log(ui);
+    $(this).addClass("dropover");
+    $(".bottom-trash").addClass("bottom-trash-drag");
   },
   deactivate: function(event, ui){
-    console.log(ui);
+    $(this).removeClass("dropover");
+    $(".bottom-trash").removeClass("bottom-trash-drag")
   },
   over: function(event){
-    console.log(event);
+    $(event.target).addClass("dropover-active");
   },
   out: function(event){
-    console.log(event);
+    $(event.target).removeClass("dropover-active");
   },
   update: function(event) {
     // array to store the task data
@@ -201,7 +203,7 @@ $(".card .list-group").sortable({
 var auditTask = function(taskEl) {
   //to ensure element is getting to the function
   var taskDueDate = $(taskEl).find("span").text().trim();
-  
+
   //convert due date to moment object
   var time = moment(taskDueDate, "L").set("hour", 17);
   
@@ -222,12 +224,13 @@ $("#trash").droppable({
   tolerance: "touch",
   drop: function(event, ui) {
     ui.draggable.remove();
+    $(".bottom-trash").removeClass("bottom-trash-active");
   },
   over: function(event, ui) {
-    console.log(ui);
+    $(".bottom-trash").addClass("bottom-trash-active");
   },
   out: function(event, ui) {
-    console.log(ui);
+    $(".bottom-trash").removeClass("bottom-trash-active");
   }
 });
 
@@ -250,7 +253,7 @@ $("#task-form-modal").on("shown.bs.modal", function() {
 });
 
 // save button in modal was clicked
-$("#task-form-modal .btn-primary").click(function() {
+$("#task-form-modal .btn-save").click(function() {
   // get form values
   var taskText = $("#modalTaskDescription").val();
   var taskDate = $("#modalDueDate").val();
@@ -270,6 +273,13 @@ $("#task-form-modal .btn-primary").click(function() {
     saveTasks();
   }
 });
+
+//function to update the page ocassionaly
+setInterval(function() {
+  $(".card .list-group-item").each(function(index, el){
+    auditTask(el);
+  });
+}, 1800000);
 
 // remove all tasks
 $("#remove-tasks").on("click", function() {
